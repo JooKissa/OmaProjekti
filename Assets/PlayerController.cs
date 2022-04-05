@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
+            playerRb.constraints = RigidbodyConstraints.FreezeAll;
             Vector3 avg = new Vector3(0, 0, 0);
             int i = 0;
             foreach (ContactPoint contact in collision.contacts)
@@ -55,8 +56,10 @@ public class PlayerController : MonoBehaviour
                 i++;
             }
             avg /= i;
-            gravityDirection = avg - transform.position;
-            focalPoint.SendMessage("UpdateCameraRotation", gravityDirection);
+            Vector3 gravityDir = avg - transform.position;
+            focalPoint.SendMessage("UpdateGravityDirection", gravityDir);
+            gravityDirection = gravityDir;
+            playerRb.constraints = RigidbodyConstraints.None;
         }
     }
 }
