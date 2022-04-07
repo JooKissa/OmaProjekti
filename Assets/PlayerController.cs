@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviour
         float verticalInput = Input.GetAxis("Vertical");
         float horizontalInput = Input.GetAxis("Horizontal");
         if (Input.GetButtonDown("Jump")) playerRb.AddForce(-gravityDirection * 1000 / gravityMultiplier);
-        playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * Time.deltaTime);
+        playerRb.AddForce(focalPoint.transform.up * verticalInput * speed * Time.deltaTime);
         playerRb.AddForce(focalPoint.transform.right * horizontalInput * speed * Time.deltaTime);
     }
 
@@ -43,8 +43,22 @@ public class PlayerController : MonoBehaviour
         //transform.rotation.z = 0;
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, 0.6f);
+    }
+    public Vector3 hitPoss;
     private void OnCollisionEnter(Collision collision)
     {
+        Vector3 hitPos;
+        RaycastHit hit;
+        if (Physics.SphereCast(transform.position, 0.6f, transform.forward, out hit, 10))
+        {
+            hitPos = hit.point;
+            hitPoss = hit.point;
+        }
+
         if (collision.gameObject.CompareTag("Ground"))
         {
             //playerRb.constraints = RigidbodyConstraints.FreezeAll;

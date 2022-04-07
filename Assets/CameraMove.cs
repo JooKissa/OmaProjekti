@@ -26,7 +26,7 @@ public class CameraMove : MonoBehaviour
     {
         float deltaX = Input.GetAxis("Mouse X") * turnSpeed;
         float deltaY = Input.GetAxis("Mouse Y") * turnSpeed;
-        transform.Rotate(Vector3.up, deltaX * speed * Time.deltaTime);
+        transform.Rotate(Vector3.back, deltaX * speed * Time.deltaTime);
         //controlPoint.transform.Rotate(Vector3.left, deltaY * speed * Time.deltaTime);
         Camera.transform.RotateAround(transform.position, -transform.right, deltaY);
         //if ((Camera.transform.rotation.y < maxRotation || deltaY > 0) && (Camera.transform.rotation.y > MinRotation || deltaY < 0))
@@ -35,13 +35,14 @@ public class CameraMove : MonoBehaviour
 
     private void UpdateGravityDirection(Vector3 gravityDir)
     {
-        cameraUpDirection = -gravityDir;
-        Vector3 gravityAlongLocalZAxis = transform.forward * Vector3.Dot(gravityDir, transform.forward);
-        Vector3 gravityInLocalXYPlane = gravityDir - gravityAlongLocalZAxis;
-        Vector3 old = transform.forward;
-        transform.LookAt(transform.position + Vector3.forward, -gravityInLocalXYPlane);
-        gravShow.transform.LookAt(gravityDir);
-        yes = transform.forward * Vector3.Dot(transform.forward, old);
+        transform.LookAt(transform.position + gravityDir);
+        //cameraUpDirection = -gravityDir;
+        //Vector3 gravityAlongLocalZAxis = transform.forward * Vector3.Dot(gravityDir, transform.forward);
+        //Vector3 gravityInLocalXYPlane = gravityDir - gravityAlongLocalZAxis;
+        //Vector3 old = transform.forward;
+        //transform.LookAt(transform.position + Vector3.forward, -gravityInLocalXYPlane);
+        gravShow.transform.LookAt(gravShow.transform.position + gravityDir);
+        //yes = transform.forward * Vector3.Dot(transform.forward, old);
 
     }
 }
