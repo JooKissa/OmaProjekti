@@ -13,11 +13,14 @@ public class CameraMove : MonoBehaviour
     public float maxRotation = 90f;
     public float MinRotation = -90f;
     public Vector3 cameraUpDirection = Vector3.up;
+    public Vector3 yes;
+    private GameObject gravShow;
 
     private void Start()
     {
         controlPoint = GameObject.Find("Control Point");
         Camera = GameObject.Find("Main Camera");
+        gravShow = GameObject.Find("GravityRepresentation");
     }
     private void Update()
     {
@@ -35,6 +38,10 @@ public class CameraMove : MonoBehaviour
         cameraUpDirection = -gravityDir;
         Vector3 gravityAlongLocalZAxis = transform.forward * Vector3.Dot(gravityDir, transform.forward);
         Vector3 gravityInLocalXYPlane = gravityDir - gravityAlongLocalZAxis;
-        transform.LookAt(Vector3.forward, -gravityInLocalXYPlane);
+        Vector3 old = transform.forward;
+        transform.LookAt(transform.position + Vector3.forward, -gravityInLocalXYPlane);
+        gravShow.transform.LookAt(gravityDir);
+        yes = transform.forward * Vector3.Dot(transform.forward, old);
+
     }
 }
