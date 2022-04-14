@@ -24,11 +24,15 @@ public class CameraMove : MonoBehaviour
     }
     private void Update()
     {
-        float deltaX = Input.GetAxis("Mouse X") * turnSpeed;
-        float deltaY = Input.GetAxis("Mouse Y") * turnSpeed;
-        transform.Rotate(Vector3.back, deltaX * speed * Time.deltaTime);
+        if (Input.GetMouseButton(1))
+        {
+            float deltaX = Input.GetAxis("Mouse X") * turnSpeed;
+            float deltaY = Input.GetAxis("Mouse Y") * turnSpeed;
+            transform.Rotate(Vector3.back, deltaX * speed * Time.deltaTime);
+            Camera.transform.RotateAround(transform.position, -transform.right, deltaY);
+        }
         //controlPoint.transform.Rotate(Vector3.left, deltaY * speed * Time.deltaTime);
-        Camera.transform.RotateAround(transform.position, -transform.right, deltaY);
+        
         //if ((Camera.transform.rotation.y < maxRotation || deltaY > 0) && (Camera.transform.rotation.y > MinRotation || deltaY < 0))
         transform.position = player.transform.position;
     }
