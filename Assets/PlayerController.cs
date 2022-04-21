@@ -37,15 +37,25 @@ public class PlayerController : MonoBehaviour
         //playerRb.AddForce(gravityDirection * 10 * gravityMultiplier);
         float verticalInput = Input.GetAxis("Vertical");
         float horizontalInput = Input.GetAxis("Horizontal");
-        if (Input.GetButtonDown("Jump") && canJump == true)
+        if (Input.GetButton("Jump") && canJump == true)
         {
-            playerRb.AddForce(-gravityDirection * stagePower[jumpStage] * 100 / gravityMultiplier);
+            Vector3 vel = playerRb.velocity;
+            playerRb.velocity = new Vector3(vel.x, vel.y + 5, vel.z);
             canJump = false;
         }
-        playerRb.MovePosition(playerRb.position + focalPoint.transform.right * horizontalInput * speed * Time.deltaTime);
-        playerRb.MovePosition(playerRb.position + focalPoint.transform.forward * verticalInput * speed * Time.deltaTime);
-        //playerRb.AddForce(focalPoint.transform.up * verticalInput * speed * Time.deltaTime);
-        //playerRb.AddForce(focalPoint.transform.right * horizontalInput * speed * Time.deltaTime);
+        if (horizontalInput != 0 && canJump == false)
+        {
+            //transform.LookAt(transform.position + focalPoint.transform.forward);
+            playerRb.rotation = focalPoint.transform.rotation;
+            Vector3 forw = focalPoint.transform.forward;
+            Vector3 vel = playerRb.velocity;
+            Vector2 velHz = new Vector2(vel.x, vel.z);
+            playerRb.velocity = new Vector3(velHz.magnitude * forw.x, vel.y, velHz.magnitude * forw.z);
+        }
+        //playerRb.MovePosition(playerRb.position + focalPoint.transform.right * horizontalInput * speed * Time.deltaTime);
+        //playerRb.MovePosition(playerRb.position + focalPoint.transform.forward * verticalInput * speed * Time.deltaTime);
+        playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * 500 * Time.deltaTime);
+        if (canJump) playerRb.AddForce(focalPoint.transform.right * horizontalInput * speed * 500 * Time.deltaTime);
         if (Input.GetButton("Control")) playerRb.AddForce(gravityDirection / gravityMultiplier * 100);
     }
 
@@ -68,13 +78,6 @@ public class PlayerController : MonoBehaviour
             jumpStage = stage;
         }
     }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, 0.6f);
-    }
-    public Vector3 hitPoss;
 
     private void OnCollisionEnter(Collision collision)
     {
