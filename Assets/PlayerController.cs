@@ -6,84 +6,72 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float turnSpeed = 3.0f;
     [SerializeField] private GameObject gameCamera;
-    [SerializeField] private bool canJump = true;
+    [SerializeField] private bool onGround = true;
+    [SerializeField] private int ballMode = 1;
     private Rigidbody playerRb;
     private GameObject focalPoint;
+    private bool jumped = false;
     private float speed = 5;
-    [SerializeField] private int jumpStage = 0;
-    private Vector3 gravityDirection = new Vector3(0, -1, 0);
-    public float gravityMultiplier = 0.1f;
-    public float jumpMultiplier = 10;
-    [SerializeField] private int[] stagePower;
+    private float m2Speed = 10;
+    private float jumpPower = 3;
+    private float m2JumpPower = 15;
     // Start is called before the first frame update
     void Start()
     {
-        stagePower = new int[6];
-        stagePower[0] = 10;
-        stagePower[1] = 20;
-        stagePower[2] = 40;
-        stagePower[3] = 80;
-        stagePower[4] = 160;
-        stagePower[5] = 320;
-        Physics.gravity = new Vector3(0, -10.0F, 0);
         playerRb = GetComponent<Rigidbody>();
-        //playerRb.useGravity = false;
         focalPoint = GameObject.Find("Focal Point");
     }
 
-    // Update is called once per frame
+    private void setBallMode(int mode)
+    {
+        ballMode = mode;
+    }
+
     void Update()
     {
-        //playerRb.AddForce(gravityDirection * 10 * gravityMultiplier);
         float verticalInput = Input.GetAxis("Vertical");
         float horizontalInput = Input.GetAxis("Horizontal");
-        if (Input.GetButton("Jump") && canJump == true)
+        if (Input.GetButton("Jump") && onGround == true)
         {
             Vector3 vel = playerRb.velocity;
-            playerRb.velocity = new Vector3(vel.x, vel.y + 5, vel.z);
-            canJump = false;
+            if (ballMode == 1) playerRb.velocity = new Vector3(vel.x, vel.y + jumpPower, vel.z);
+            if (ballMode == 2) playerRb.velocity = new Vector3(vel.x, vel.y + m2JumpPower, vel.z);
+            onGround = false;
+            jumped = true;
         }
-        if (horizontalInput != 0 && canJump == false)
+        if (ballMode == 1 && onGround)
         {
-            //transform.LookAt(transform.position + focalPoint.transform.forward);
-            playerRb.rotation = focalPoint.transform.rotation;
-            Vector3 forw = focalPoint.transform.forward;
-            Vector3 vel = playerRb.velocity;
-            Vector2 velHz = new Vector2(vel.x, vel.z);
-            playerRb.velocity = new Vector3(velHz.magnitude * forw.x, vel.y, velHz.magnitude * forw.z);
+            playerRb.AddForce(focalPoint.transform.right * horizontalInput * speed * 500 * Time.deltaTime);
+            playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * 500 * Time.deltaTime);
         }
-        //playerRb.MovePosition(playerRb.position + focalPoint.transform.right * horizontalInput * speed * Time.deltaTime);
-        //playerRb.MovePosition(playerRb.position + focalPoint.transform.forward * verticalInput * speed * Time.deltaTime);
-        playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * 500 * Time.deltaTime);
-        if (canJump) playerRb.AddForce(focalPoint.transform.right * horizontalInput * speed * 500 * Time.deltaTime);
-        if (Input.GetButton("Control")) playerRb.AddForce(gravityDirection / gravityMultiplier * 100);
+        else if (ballMode == 2)
+        {
+            playerRb.velocity = new Vector3(0, playerRb.velocity.y, 0);
+            playerRb.MovePosition(playerRb.position + focalPoint.transform.right * horizontalInput * m2Speed * Time.deltaTime);
+            playerRb.MovePosition(playerRb.position + focalPoint.transform.forward * verticalInput * m2Speed * Time.deltaTime);
+        }
     }
 
-    void LateUpdate()
+    private void OnCollisionExit(Collision collision)
     {
-        //float delta = Input.GetAxis("Mouse X") * turnSpeed;
-        //gameCamera.transform.RotateAround(transform.position, Vector3.up, delta);
-        if (Input.GetMouseButton(1))
+        if (collision.gameObject.CompareTag("Ground"))
         {
-            //float delta = Input.GetAxis("Mouse X") * turnSpeed;
-            //gameCamera.transform.RotateAround(transform.position, Vector3.up, delta);
-        }
-        //transform.rotation.z = 0;
-    }
-
-    private void upgradeStage(int stage)
-    {
-        if (stage > jumpStage)
-        {
-            jumpStage = stage;
+            if (onGround == true) onGround = false;
         }
     }
-
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            if (canJump == false) canJump = true;
+            if (onGround == false) onGround = true;
+            if (jumped) jumped = false;
+        }
+    }
+    private void OnCollisionStay(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground") && !jumped)
+        {
+            if (onGround == false) onGround = true;
         }
     }
 }
