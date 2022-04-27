@@ -13,8 +13,11 @@ public class PlayerController : MonoBehaviour
     private bool jumped = false;
     private float speed = 5;
     private float m2Speed = 10;
-    private float jumpPower = 3;
-    private float m2JumpPower = 15;
+    private float jumpPower = 20;
+    private float m2JumpPower = 25;
+    private int maxAirJumps = 1;
+    private int airJumps;
+    private int maxSpeed = 10;
     // Start is called before the first frame update
     void Start()
     {
@@ -29,20 +32,22 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        playerRb.AddForce(Vector3.down * 1500 * Time.deltaTime, ForceMode.Acceleration);
         float verticalInput = Input.GetAxis("Vertical");
         float horizontalInput = Input.GetAxis("Horizontal");
-        if (Input.GetButton("Jump") && onGround == true)
+        if (Input.GetButtonDown("Jump") && (onGround == true || airJumps > 0))
         {
             Vector3 vel = playerRb.velocity;
             if (ballMode == 1) playerRb.velocity = new Vector3(vel.x, vel.y + jumpPower, vel.z);
             if (ballMode == 2) playerRb.velocity = new Vector3(vel.x, vel.y + m2JumpPower, vel.z);
+            airJumps--;
             onGround = false;
             jumped = true;
         }
-        if (ballMode == 1 && onGround)
+        if (ballMode == 1)
         {
-            playerRb.AddForce(focalPoint.transform.right * horizontalInput * speed * 500 * Time.deltaTime);
-            playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * 500 * Time.deltaTime);
+            playerRb.AddForce(focalPoint.transform.right * horizontalInput * speed * 5 * Time.deltaTime, ForceMode.VelocityChange);
+            playerRb.AddForce(focalPoint.transform.forward * verticalInput * speed * 5 * Time.deltaTime, ForceMode.VelocityChange);
         }
         else if (ballMode == 2)
         {
@@ -50,6 +55,7 @@ public class PlayerController : MonoBehaviour
             playerRb.MovePosition(playerRb.position + focalPoint.transform.right * horizontalInput * m2Speed * Time.deltaTime);
             playerRb.MovePosition(playerRb.position + focalPoint.transform.forward * verticalInput * m2Speed * Time.deltaTime);
         }
+        if (playerRb.velocity.magnitude > maxSpeed) playerRb.AddForce(-playerRb.velocity / playerRb.velocity.magnitude * playerRb.velocity.magnitude * Time.deltaTime, ForceMode.VelocityChange);
     }
 
     private void OnCollisionExit(Collision collision)
@@ -57,6 +63,7 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             if (onGround == true) onGround = false;
+            airJumps = maxAirJumps;
         }
     }
     private void OnCollisionEnter(Collision collision)
