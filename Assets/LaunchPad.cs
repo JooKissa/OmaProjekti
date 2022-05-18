@@ -10,7 +10,7 @@ public class LaunchPad : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
-            collision.gameObject.GetComponent<Rigidbody>().AddForce(Vector3.up * boostHeight * 100);
+            collision.gameObject.GetComponent<Rigidbody>().AddForce(transform.up * boostHeight, ForceMode.VelocityChange);
         }
     }
 }

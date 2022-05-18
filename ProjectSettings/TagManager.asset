@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ground
+  - Spawnpoint
+  - Walljump
+  - StageSeparator
+  - LoadScreen
+  - Game
   layers:
   - Default
   - TransparentFX
