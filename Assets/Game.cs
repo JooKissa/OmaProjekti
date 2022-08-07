@@ -21,7 +21,7 @@ public class Game : MonoBehaviour
         loadScreen.SetActive(false);
         foreach(GameObject stage in stageObjects)
         {
-            if (stage != stageObjects[0]) stage.SetActive(false);
+            stage.SetActive(false);
         }
         GoStage(1);
     }
@@ -45,7 +45,11 @@ public class Game : MonoBehaviour
             GoStage(5);
         }
         if (Input.GetKey(KeyCode.Alpha6)) {
-            GoStage(5);
+            GoStage(6);
+        }
+        if (Input.GetKey(KeyCode.Alpha7))
+        {
+            GoStage(7);
         }
     }
 
@@ -56,15 +60,14 @@ public class Game : MonoBehaviour
     private IEnumerator Process(int destination)
     {
         loadScreen.SetActive(true);
-        yield return new WaitForSeconds(0.1f);
         foreach (GameObject stage in stageObjects)
         {
-            if (stage != stageObjects[0]) stage.SetActive(false);
+            stage.SetActive(false);
         }
         stageObjects[destination].SetActive(true);
         Player.transform.position = teleports[destination].transform.position;
         spawnPoint.transform.position = teleports[destination].transform.position;
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
         loadScreen.SetActive(false);
     }
 }
